@@ -22,6 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { format, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 import { TimeclockService } from '../services/TimeclockService';
+import { ExportService } from '../services/ExportService';
 
 export default function TimecardHistoryScreen() {
   const [timecards, setTimecards] = useState([]);
@@ -35,6 +36,7 @@ export default function TimecardHistoryScreen() {
     overtimeHours: 0,
     doubleTimeHours: 0,
   });
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     loadTimecards();
@@ -144,19 +146,27 @@ export default function TimecardHistoryScreen() {
 
   const exportData = () => {
     Alert.alert(
-      'Export Data',
-      'Export timecard data to CSV format?',
+      'Export Format',
+      'Choose export format:',
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Export',
-          onPress: () => {
-            // TODO: Implement CSV export
-            Alert.alert('Export', 'Export feature will be available soon!');
-          },
-        },
+        { text: 'CSV', onPress: () => performExport('csv') },
+        { text: 'JSON', onPress: () => performExport('json') },
+        { text: 'HTML Report', onPress: () => performExport('pdf') },
       ]
     );
+  };
+
+  const performExport = async (format) => {
+    setExporting(true);
+    try {
+      const result = await ExportService.exportTimecardData(filteredTimecards, { format });
+      Alert.alert('Success', `Exported ${result.recordCount} records to ${result.fileName}`);
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to export data');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const submitForApproval = (date) => {

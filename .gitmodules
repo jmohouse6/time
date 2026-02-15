@@ -1,0 +1,3 @@
+[submodule "docs/ecosystem"]
+	path = docs/ecosystem
+	url = https://github.com/jmohouse6/moorhouse-ecosystem.git

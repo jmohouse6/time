@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Alert,
 } from 'react-native';
+import * as Sharing from 'expo-sharing';
 import {
   Card,
   Title,
@@ -88,9 +90,20 @@ export default function PhotoViewer({ photos = [], visible, onClose, selectedPho
               icon="share"
               size={24}
               iconColor="#fff"
-              onPress={() => {
-                // TODO: Implement photo sharing
-                console.log('Share photo:', currentPhoto);
+              onPress={async () => {
+                try {
+                  if (await Sharing.isAvailableAsync()) {
+                    await Sharing.shareAsync(currentPhoto.uri, {
+                      mimeType: 'image/jpeg',
+                      dialogTitle: 'Share Timeclock Photo',
+                    });
+                  } else {
+                    Alert.alert('Sharing Unavailable', 'Sharing is not available on this device');
+                  }
+                } catch (error) {
+                  console.error('Error sharing photo:', error);
+                  Alert.alert('Error', 'Failed to share photo');
+                }
               }}
             />
           </View>

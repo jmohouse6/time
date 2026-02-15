@@ -20,6 +20,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LocationService } from '../services/LocationService';
 
 export default function JobSelectionScreen() {
@@ -34,6 +35,7 @@ export default function JobSelectionScreen() {
   useEffect(() => {
     loadJobSites();
     getCurrentLocation();
+    loadSavedSelection();
   }, []);
 
   const loadJobSites = async () => {
@@ -53,6 +55,19 @@ export default function JobSelectionScreen() {
       await findNearbyJobs(location);
     } catch (error) {
       console.warn('Could not get current location:', error);
+    }
+  };
+
+  const loadSavedSelection = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('selectedJobAndTask');
+      if (saved) {
+        const { job, task } = JSON.parse(saved);
+        setSelectedJob(job);
+        setSelectedTask(task);
+      }
+    } catch (error) {
+      console.error('Error loading saved selection:', error);
     }
   };
 
@@ -118,9 +133,16 @@ export default function JobSelectionScreen() {
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Confirm',
-          onPress: () => {
-            // TODO: Save selection to AsyncStorage
-            Alert.alert('Success', 'Job and task selection saved!');
+          onPress: async () => {
+            try {
+              await AsyncStorage.setItem('selectedJobAndTask', JSON.stringify({
+                job: selectedJob,
+                task: selectedTask,
+              }));
+              Alert.alert('Success', 'Job and task selection saved!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to save selection');
+            }
           },
         },
       ]
