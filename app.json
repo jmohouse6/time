@@ -30,8 +30,7 @@
       ],
       "package": "com.anonymous.timeclock"
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       [
         "react-native-vision-camera",
@@ -53,6 +52,12 @@
           "photosPermission": "The app accesses your photos to let you take timeclock verification photos."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "11657d6a-4fe9-4042-a400-a8c747719ec9"
+      }
+    },
+    "owner": "jpmoorhouse"
   }
 }
